@@ -2,13 +2,13 @@ import type { LessonContent, QuizQuestion } from "../appTypes";
 
 export const lesson: LessonContent = {
     lessonDate: "November 22, 2026",
-    lessonTitle: "The Strength of Covenant – Part 5",
+    lessonTitle: "The Strength of Covenant - Part 5",
 
     memoryVerse:
         "And ye shall know the truth, and the truth shall make you free. (John 8:32)",
     memoryVerseRef: "John 8:32",
 
-    introScriptures: ["Joshua 9:14-19", "2 Samuel 21:1-9"],
+    introScriptures: [],
     lessonIntroScriptures: [
         "Psalm 103:20",
         "Isaiah 14:16-17",
@@ -22,9 +22,9 @@ export const lesson: LessonContent = {
     objectives: "To cause man to be mindful of holy covenants and discard evil covenants through Christ.",
 
     lessonIntro:
-        "No covenant is weak except the witness is weak, but it is obvious that all covenants are strong because the witnesses are strong. God is ultimately strong, and even the fallen angels by whom people initiate covenants are strong (Psalm 103:20; Isaiah 14:16–17; Ezekiel 28:14). Only that their strength cannot be compared to God’s. Let us see more things that took place as Israel initiated a covenant with Gibeon (Joshua 9:14–19; 2 Samuel 21:1–9).",
+        "No covenant is weak except the witness is weak, but it is obvious that all covenants are strong because the witnesses are strong. God is ultimately strong, and even the fallen angels by whom people initiate covenants are strong (Psalm 103:20; Isaiah 14:16-17; Ezekiel 28:14). Only that their strength cannot be compared to God’s. Let us see more things that took place as Israel initiated a covenant with Gibeon (Joshua 9:14–19; 2 Samuel 21:1–9).",
 
-    lessonPoints: [
+    lessonPoints: [ 
         {
             title: "Loosing an Inheritance",
             content:

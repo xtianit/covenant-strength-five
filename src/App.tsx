@@ -57,7 +57,7 @@ const VERSIONS: BibleVersion[] = ["KJV", "NKJV", "NIV", "ESV", "AMP", "NLT"];
 const LESSON_KEY = lesson.lessonDate;
 const LESSON_SLUG = LESSON_KEY.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
 const PRAYER_TOTAL = lesson.prayerPoints.length;
-const CARD_REFS = Object.keys(scriptureDB).filter((k) => !k.includes("-"));
+const CARD_REFS = Object.keys(scriptureDB);
 
 const KEYS = {
     xp: "sunday_school_xp",
@@ -1128,14 +1128,16 @@ const SundaySchoolApp = () => {
                                         </div>
                                     </div>
 
-                                    <div>
+                                                                        <div>
                                         <h2 className="mb-3 text-base font-bold">Introduction</h2>
-                                        <p className="mb-4 leading-relaxed">{lesson.introduction}</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {lesson.introScriptures.map((r) => (
-                                                <VerseChip key={r} reference={r} read={stats.verses.includes(r)} onOpen={openVerse} />
-                                            ))}
-                                        </div>
+                                        <p className={`leading-relaxed ${lesson.introScriptures.length > 0 ? "mb-4" : ""}`}>{lesson.introduction}</p>
+                                        {lesson.introScriptures.length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {lesson.introScriptures.map((r) => (
+                                                    <VerseChip key={r} reference={r} read={stats.verses.includes(r)} onOpen={openVerse} />
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="grid gap-4 sm:grid-cols-2">
@@ -1171,7 +1173,16 @@ const SundaySchoolApp = () => {
                                     <div className="h-1.5 overflow-hidden rounded-full bg-slate-700/30" aria-hidden="true">
                                         <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all duration-500" style={{ width: `${(stats.points.length / lesson.lessonPoints.length) * 100}%` }} />
                                     </div>
-                                    <p className="leading-relaxed opacity-90">{lesson.lessonIntro}</p>
+                                                                        <div>
+                                        <p className={`leading-relaxed opacity-90 ${lesson.lessonIntroScriptures && lesson.lessonIntroScriptures.length > 0 ? "mb-4" : ""}`}>{lesson.lessonIntro}</p>
+                                        {lesson.lessonIntroScriptures && lesson.lessonIntroScriptures.length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {lesson.lessonIntroScriptures.map((r) => (
+                                                    <VerseChip key={r} reference={r} read={stats.verses.includes(r)} onOpen={openVerse} />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
                                     <div className="space-y-4">
                                         {lesson.lessonPoints.map((p, idx) => {
