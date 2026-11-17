@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Minus, Plus, Moon, Sun, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Minus, Plus, Moon, Sun, ChevronDown, Type } from "lucide-react";
 
 type HeaderProps = {
     logo: string;
@@ -19,6 +19,32 @@ export default function Header({
     toggleTheme,
 }: HeaderProps) {
     const [openDropdown, setOpenDropdown] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close the mobile panel only when tapping outside it or pressing Escape.
+    useEffect(() => {
+        if (!openDropdown) return;
+
+        const onPointerDown = (e: PointerEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setOpenDropdown(false);
+            }
+        };
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpenDropdown(false);
+        };
+
+        document.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [openDropdown]);
+
+    // touch-manipulation removes the double-tap-zoom delay so rapid taps all register.
+    const stepBtn =
+        "flex h-11 w-11 items-center justify-center rounded-xl touch-manipulation select-none transition active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70";
 
     return (
         <div className="flex flex-row justify-between p-3 items-center gap-3 md:flex-row sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
@@ -44,57 +70,121 @@ export default function Header({
             {/* Controls */}
             <div className="flex gap-2 items-center">
                 {/* Desktop Controls */}
-                <div className="hidden md:flex gap-2 items-center">
+                <div className="hidden md:flex items-center gap-1 rounded-2xl bg-white/15 p-1 ring-1 ring-white/20 backdrop-blur-sm">
                     <button
+                        type="button"
                         onClick={() => adjustFontSize(-2)}
-                        className="p-2 hover:bg-white/25 rounded-lg transition active:scale-95"
+                        className={`${stepBtn} hover:bg-white/25`}
                         title="Decrease Font Size"
+                        aria-label="Decrease font size"
                     >
-                        <Minus size={20} />
+                        <Minus size={18} strokeWidth={2.5} />
                     </button>
-                    <span className="px-2 text-sm font-mono">{fontSize}px</span>
-                    <button
-                        onClick={() => adjustFontSize(2)}
-                        className="p-2 hover:bg-white/25 rounded-lg transition active:scale-95"
-                        title="Increase Font Size"
+                    <span
+                        className="min-w-[3.5rem] text-center text-sm font-mono font-semibold tabular-nums"
+                        aria-live="polite"
                     >
-                        <Plus size={20} />
+                        {fontSize}px
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => adjustFontSize(2)}
+                        className={`${stepBtn} hover:bg-white/25`}
+                        title="Increase Font Size"
+                        aria-label="Increase font size"
+                    >
+                        <Plus size={18} strokeWidth={2.5} />
                     </button>
                 </div>
 
-                {/* Mobile Dropdown */}
-                <div className="relative md:hidden">
+                {/* Mobile Font Panel */}
+                <div className="relative md:hidden" ref={dropdownRef}>
                     <button
-                        onClick={() => setOpenDropdown(!openDropdown)}
-                        className="flex items-center gap-1 p-2 bg-white/20 rounded-lg active:scale-95"
+                        type="button"
+                        onClick={() => setOpenDropdown((o) => !o)}
+                        aria-haspopup="true"
+                        aria-expanded={openDropdown}
+                        aria-label="Text size"
+                        className={`flex h-11 items-center gap-1.5 rounded-xl px-3 touch-manipulation select-none ring-1 ring-white/25 transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${
+                            openDropdown ? "bg-white/30" : "bg-white/15"
+                        }`}
                     >
-                        <span className="font-bold">Aa</span>
-                        <ChevronDown size={16} />
+                        <span className="text-base font-bold leading-none">Aa</span>
+                        <ChevronDown
+                            size={16}
+                            className={`transition-transform duration-200 ${openDropdown ? "rotate-180" : ""}`}
+                        />
                     </button>
+
                     {openDropdown && (
-                        <div className="absolute right-0 mt-2 bg-white text-gray-800 rounded-xl shadow-2xl p-3 flex flex-col gap-2 w-40 border border-gray-100 z-50">
-                            <button
-                                onClick={() => {
-                                    adjustFontSize(-2);
-                                    setOpenDropdown(false);
-                                }}
-                                className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg font-medium text-sm"
+                        <div
+                            role="group"
+                            aria-label="Text size controls"
+                            className={`absolute right-0 mt-3 w-64 rounded-2xl p-4 shadow-2xl ring-1 backdrop-blur-xl ${
+                                darkMode
+                                    ? "bg-slate-900/95 text-slate-100 ring-white/10"
+                                    : "bg-white/95 text-slate-800 ring-slate-200"
+                            }`}
+                        >
+                            {/* little pointer arrow */}
+                            <div
+                                aria-hidden="true"
+                                className={`absolute -top-1.5 right-6 h-3 w-3 rotate-45 ${
+                                    darkMode ? "bg-slate-900" : "bg-white"
+                                }`}
+                            />
+
+                            <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider opacity-60">
+                                <Type size={13} aria-hidden="true" />
+                                Text size
+                            </div>
+
+                            <div
+                                className={`flex items-center justify-between gap-2 rounded-2xl p-1.5 ${
+                                    darkMode ? "bg-slate-800" : "bg-slate-100"
+                                }`}
                             >
-                                <span>Decrease</span>
-                                <Minus size={16} />
-                            </button>
-                            <span className="text-center font-bold text-blue-600 font-mono py-1 bg-gray-50 rounded">
-                                {fontSize}px
-                            </span>
+                                <button
+                                    type="button"
+                                    onClick={() => adjustFontSize(-2)}
+                                    aria-label="Decrease font size"
+                                    className={`${stepBtn} h-12 w-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-600/30 hover:brightness-110`}
+                                >
+                                    <Minus size={20} strokeWidth={2.75} />
+                                </button>
+
+                                <div className="flex flex-col items-center leading-tight">
+                                    <span
+                                        className="text-xl font-extrabold tabular-nums"
+                                        aria-live="polite"
+                                    >
+                                        {fontSize}
+                                    </span>
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest opacity-60">
+                                        px
+                                    </span>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => adjustFontSize(2)}
+                                    aria-label="Increase font size"
+                                    className={`${stepBtn} h-12 w-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md shadow-blue-600/30 hover:brightness-110`}
+                                >
+                                    <Plus size={20} strokeWidth={2.75} />
+                                </button>
+                            </div>
+
                             <button
-                                onClick={() => {
-                                    adjustFontSize(2);
-                                    setOpenDropdown(false);
-                                }}
-                                className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-lg font-medium text-sm"
+                                type="button"
+                                onClick={() => setOpenDropdown(false)}
+                                className={`mt-3 w-full rounded-xl py-2.5 text-xs font-semibold touch-manipulation transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+                                    darkMode
+                                        ? "bg-slate-800 text-slate-200 hover:bg-slate-700"
+                                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                }`}
                             >
-                                <span>Increase</span>
-                                <Plus size={16} />
+                                Done
                             </button>
                         </div>
                     )}
@@ -102,8 +192,10 @@ export default function Header({
 
                 {/* Theme Toggle */}
                 <button
+                    type="button"
                     onClick={toggleTheme}
-                    className="p-2 hover:bg-white/20 rounded-lg transition ml-2"
+                    aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                    className="flex h-11 w-11 items-center justify-center rounded-xl touch-manipulation transition hover:bg-white/20 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ml-1"
                 >
                     {darkMode ? <Sun size={24} /> : <Moon size={24} />}
                 </button>
